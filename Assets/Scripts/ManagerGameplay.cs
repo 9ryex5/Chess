@@ -342,18 +342,54 @@ public class ManagerGameplay : MonoBehaviour
                 target = new Vector2Int(_cell.pos.x - 1, _cell.pos.y);
                 if (IsPosBoard(target) && (board[target.x, target.y].pieceType == PieceType.NONE || board[target.x, target.y].pieceBlack != blackTurn)) possibleMoves.Add(board[target.x, target.y]);
 
-                //TODO king can't move through checks
                 if (blackTurn)
                 {
                     if (canCastleQBlack)
                     {
                         if (board[1, 7].pieceType == PieceType.NONE && board[2, 7].pieceType == PieceType.NONE && board[3, 7].pieceType == PieceType.NONE)
-                            possibleMoves.Add(board[2, 7]);
+                        {
+                            bool check = false;
+
+                            board[4, 7].pieceType = PieceType.NONE;
+                            board[3, 7].pieceType = PieceType.KING;
+                            board[3, 7].pieceBlack = true;
+                            if (IsChecking(true)) check = true;
+
+                            board[2, 7].pieceType = PieceType.KING;
+                            board[2, 7].pieceBlack = true;
+                            if (!check && IsChecking(true)) check = true;
+
+                            board[1, 7].pieceType = PieceType.KING;
+                            board[1, 7].pieceBlack = true;
+                            if (!check && IsChecking(true)) check = true;
+
+                            board[3, 7].pieceType = PieceType.NONE;
+                            board[2, 7].pieceType = PieceType.NONE;
+                            board[1, 7].pieceType = PieceType.NONE;
+
+                            if (!check) possibleMoves.Add(board[2, 7]);
+                        }
                     }
                     if (canCastleKBlack)
                     {
                         if (board[5, 7].pieceType == PieceType.NONE && board[6, 7].pieceType == PieceType.NONE)
-                            possibleMoves.Add(board[6, 7]);
+                        {
+                            bool check = false;
+
+                            board[4, 7].pieceType = PieceType.NONE;
+                            board[5, 7].pieceType = PieceType.KING;
+                            board[5, 7].pieceBlack = true;
+                            if (IsChecking(true)) check = true;
+
+                            board[6, 7].pieceType = PieceType.KING;
+                            board[6, 7].pieceBlack = true;
+                            if (!check && IsChecking(true)) check = true;
+
+                            board[5, 7].pieceType = PieceType.NONE;
+                            board[6, 7].pieceType = PieceType.NONE;
+
+                            if (!check) possibleMoves.Add(board[6, 7]);
+                        }
                     }
                 }
                 else
@@ -361,12 +397,49 @@ public class ManagerGameplay : MonoBehaviour
                     if (canCastleQWhite)
                     {
                         if (board[1, 0].pieceType == PieceType.NONE && board[2, 0].pieceType == PieceType.NONE && board[3, 0].pieceType == PieceType.NONE)
-                            possibleMoves.Add(board[2, 0]);
+                        {
+                            bool check = false;
+
+                            board[4, 0].pieceType = PieceType.NONE;
+                            board[3, 0].pieceType = PieceType.KING;
+                            board[3, 0].pieceBlack = false;
+                            if (IsChecking(false)) check = true;
+
+                            board[2, 0].pieceType = PieceType.KING;
+                            board[2, 0].pieceBlack = false;
+                            if (!check && IsChecking(false)) check = true;
+
+                            board[1, 0].pieceType = PieceType.KING;
+                            board[1, 0].pieceBlack = false;
+                            if (!check && IsChecking(false)) check = true;
+
+                            board[3, 0].pieceType = PieceType.NONE;
+                            board[2, 0].pieceType = PieceType.NONE;
+                            board[1, 0].pieceType = PieceType.NONE;
+
+                            if (!check) possibleMoves.Add(board[2, 0]);
+                        }
                     }
                     if (canCastleKWhite)
                     {
                         if (board[5, 0].pieceType == PieceType.NONE && board[6, 0].pieceType == PieceType.NONE)
-                            possibleMoves.Add(board[6, 0]);
+                        {
+                            bool check = false;
+
+                            board[4, 0].pieceType = PieceType.NONE;
+                            board[5, 0].pieceType = PieceType.KING;
+                            board[5, 0].pieceBlack = false;
+                            if (IsChecking(false)) check = true;
+
+                            board[6, 0].pieceType = PieceType.KING;
+                            board[6, 0].pieceBlack = false;
+                            if (!check && IsChecking(false)) check = true;
+
+                            board[5, 0].pieceType = PieceType.NONE;
+                            board[6, 0].pieceType = PieceType.NONE;
+
+                            if (!check) possibleMoves.Add(board[6, 0]);
+                        }
                     }
                 }
                 break;
@@ -529,13 +602,9 @@ public class ManagerGameplay : MonoBehaviour
                 if (Mathf.Abs(_to.x - selectedCell.pos.x) > 1)
                 {
                     if (_to.x > selectedCell.pos.x)
-                    {
-                        //TODO
-                    }
+                        ChangePiecePos(new Vector2Int(7, 7), new Vector2Int(5, 7));
                     else
-                    {
-                        //TODO
-                    }
+                        ChangePiecePos(new Vector2Int(0, 7), new Vector2Int(3, 7));
                 }
                 canCastleQBlack = false;
                 canCastleKBlack = false;
@@ -545,13 +614,9 @@ public class ManagerGameplay : MonoBehaviour
                 if (Mathf.Abs(_to.x - selectedCell.pos.x) > 1)
                 {
                     if (_to.x > selectedCell.pos.x)
-                    {
-                        //TODO
-                    }
+                        ChangePiecePos(new Vector2Int(7, 0), new Vector2Int(5, 0));
                     else
-                    {
-                        //TODO
-                    }
+                        ChangePiecePos(new Vector2Int(0, 0), new Vector2Int(3, 0));
                 }
                 canCastleQWhite = false;
                 canCastleKWhite = false;
@@ -569,11 +634,7 @@ public class ManagerGameplay : MonoBehaviour
             else enPassant.white = true;
         }
 
-        board[_to.x, _to.y].tPiece = board[selectedCell.pos.x, selectedCell.pos.y].tPiece;
-        board[_to.x, _to.y].pieceBlack = board[selectedCell.pos.x, selectedCell.pos.y].pieceBlack;
-        board[_to.x, _to.y].pieceType = board[selectedCell.pos.x, selectedCell.pos.y].pieceType;
-        board[selectedCell.pos.x, selectedCell.pos.y].tPiece.position = (Vector2)_to;
-        board[selectedCell.pos.x, selectedCell.pos.y].pieceType = PieceType.NONE;
+        ChangePiecePos(selectedCell.pos, _to);
 
         ManagerUI.MUI.UpdateCheck(IsChecking(!blackTurn));
         possibleMoves = new List<Cell>();
@@ -589,6 +650,15 @@ public class ManagerGameplay : MonoBehaviour
         ManagerUI.MUI.UpdateTurn(blackTurn);
 
         if (blackTurn && enPassant.black || !blackTurn && enPassant.white) enPassant = new EnPassant();
+    }
+
+    private void ChangePiecePos(Vector2Int _from, Vector2Int _to)
+    {
+        board[_to.x, _to.y].tPiece = board[_from.x, _from.y].tPiece;
+        board[_to.x, _to.y].pieceBlack = board[_from.x, _from.y].pieceBlack;
+        board[_to.x, _to.y].pieceType = board[_from.x, _from.y].pieceType;
+        board[_from.x, _from.y].tPiece.position = (Vector2)_to;
+        board[_from.x, _from.y].pieceType = PieceType.NONE;
     }
 
     private bool IsCheckMate()
