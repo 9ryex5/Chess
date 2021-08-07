@@ -22,6 +22,7 @@ public class ManagerUI : MonoBehaviour
         UpdateTimer(true, Settings.S.timePlayer);
         UpdateTimer(false, Settings.S.timePlayer);
         UpdateTurn(false);
+        UpdateCheck(false);
         textWin.gameObject.SetActive(false);
         buttonRestart.SetActive(false);
     }
