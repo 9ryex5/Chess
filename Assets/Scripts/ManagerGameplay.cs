@@ -595,29 +595,23 @@ public class ManagerGameplay : MonoBehaviour
         if (board[_to.x, _to.y].pieceType != PieceType.NONE) Destroy(board[_to.x, _to.y].tPiece.gameObject);
         else if (selectedCell.pieceType == PieceType.PAWN && _to == new Vector2Int(enPassant.pos.x, enPassant.pos.y + (blackTurn ? -1 : +1))) Destroy(board[_to.x, _to.y + (blackTurn ? -1 : +1)].tPiece.gameObject);
 
-        if (board[selectedCell.pos.x, selectedCell.pos.y].pieceType == PieceType.KING)
+        if (selectedCell.pieceType == PieceType.KING && Mathf.Abs(_to.x - selectedCell.pos.x) > 1)
         {
             if (blackTurn)
             {
-                if (Mathf.Abs(_to.x - selectedCell.pos.x) > 1)
-                {
-                    if (_to.x > selectedCell.pos.x)
-                        ChangePiecePos(new Vector2Int(7, 7), new Vector2Int(5, 7));
-                    else
-                        ChangePiecePos(new Vector2Int(0, 7), new Vector2Int(3, 7));
-                }
+                if (_to.x > selectedCell.pos.x)
+                    ChangePiecePos(new Vector2Int(7, 7), new Vector2Int(5, 7));
+                else
+                    ChangePiecePos(new Vector2Int(0, 7), new Vector2Int(3, 7));
                 canCastleQBlack = false;
                 canCastleKBlack = false;
             }
             else
             {
-                if (Mathf.Abs(_to.x - selectedCell.pos.x) > 1)
-                {
-                    if (_to.x > selectedCell.pos.x)
-                        ChangePiecePos(new Vector2Int(7, 0), new Vector2Int(5, 0));
-                    else
-                        ChangePiecePos(new Vector2Int(0, 0), new Vector2Int(3, 0));
-                }
+                if (_to.x > selectedCell.pos.x)
+                    ChangePiecePos(new Vector2Int(7, 0), new Vector2Int(5, 0));
+                else
+                    ChangePiecePos(new Vector2Int(0, 0), new Vector2Int(3, 0));
                 canCastleQWhite = false;
                 canCastleKWhite = false;
             }
@@ -627,11 +621,18 @@ public class ManagerGameplay : MonoBehaviour
         else if (selectedCell.pos == new Vector2Int(0, 7)) canCastleQBlack = false;
         else if (selectedCell.pos == new Vector2Int(7, 7)) canCastleKBlack = false;
 
-        if (selectedCell.pieceType == PieceType.PAWN && (selectedCell.pos.y == 1 || selectedCell.pos.y == 6) && (_to.x == 3 || _to.x == 4))
+        if (selectedCell.pieceType == PieceType.PAWN)
         {
-            enPassant.pos = new Vector2Int(_to.x, _to.y);
-            if (blackTurn) enPassant.black = true;
-            else enPassant.white = true;
+            if (selectedCell.pieceBlack && _to.y == 0 || !selectedCell.pieceBlack && _to.y == 7)
+            {
+                Promote();
+            }
+            else if ((selectedCell.pos.y == 1 || selectedCell.pos.y == 6) && (_to.x == 3 || _to.x == 4))
+            {
+                enPassant.pos = new Vector2Int(_to.x, _to.y);
+                if (blackTurn) enPassant.black = true;
+                else enPassant.white = true;
+            }
         }
 
         ChangePiecePos(selectedCell.pos, _to);
@@ -650,6 +651,13 @@ public class ManagerGameplay : MonoBehaviour
         ManagerUI.MUI.UpdateTurn(blackTurn);
 
         if (blackTurn && enPassant.black || !blackTurn && enPassant.white) enPassant = new EnPassant();
+    }
+
+    private void Promote()
+    {
+        board[selectedCell.pos.x, selectedCell.pos.y].pieceType = PieceType.QUEEN;
+        Destroy(selectedCell.tPiece.gameObject);
+        board[selectedCell.pos.x, selectedCell.pos.y].tPiece = Instantiate(blackTurn ? prefabQueenBlack : prefabQueenWhite, (Vector2)selectedCell.pos, Quaternion.identity, parentPieces);
     }
 
     private void ChangePiecePos(Vector2Int _from, Vector2Int _to)
